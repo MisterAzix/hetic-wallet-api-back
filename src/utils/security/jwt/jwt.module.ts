@@ -18,6 +18,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [JwtAuthService, JwtStrategy], // Services et stratégies
-  exports: [NestJwtModule, PassportModule, JwtAuthService], // Exportez pour réutilisation
+  exports: [NestJwtModule, PassportModule, JwtAuthService], 
 })
 export class AuthModule {}
