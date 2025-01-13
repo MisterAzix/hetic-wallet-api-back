@@ -1,6 +1,9 @@
 {
   "name": "hetic-wallet-api-back",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "description": "",
   "author": "",
   "private": true,
