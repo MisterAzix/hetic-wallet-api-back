@@ -10,3 +10,17 @@ export async function comparePassword(password: string, hash: string): Promise<b
     return await bcrypt.compare(password, hash);
 }
 
+/**
+ * Exemple d'utilisation des fonctions :
+ * 
+ * async function exampleUsage() {
+ *   const password = 'monMotDePasse';
+ *   const hashedPassword = await hashPassword(password);
+ *   console.log('Hashed Password:', hashedPassword);
+ * 
+ *   const isMatch = await comparePassword(password, hashedPassword);
+ *   console.log('Password Match:', isMatch); // Devrait afficher 'true'
+ * }
+ * 
+ * exampleUsage();
+ */
