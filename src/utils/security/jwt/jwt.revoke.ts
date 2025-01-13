@@ -1,9 +1,19 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
 const revokedTokens = new Set<string>();
 
-function revokeToken(token: string) {
+export function revokeToken(token: string) {
   revokedTokens.add(token);
 }
 
-function isTokenRevoked(token: string): boolean {
+export function isTokenRevoked(token: string): boolean {
   return revokedTokens.has(token);
+}
+
+export class TokenBlacklistService {
+    async revokeToken(token: string): Promise<void> {
+      await prisma.revokedToken.create({ data: { token } });
+    }
 }

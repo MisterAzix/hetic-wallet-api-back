@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './jwt/jwt.payload-interface';
+import { JWTPayload } from './jwt/jwt.payload-interface';
 
 
 
@@ -12,16 +12,16 @@ export class JwtAuthService {
 
 	/**
 		 * Générer un JWT pour une action spécifique
-		 * @param payload - Les données à inclure dans le JWT (doit implémenter JwtPayload)
+		 * @param payload - Les données à inclure dans le JWT (doit implémenter JWTPayload)
 		 * @returns Le token JWT généré
 		 * 
 		 * Exemple d'utilisation :
 		 * 
-		 * const payload: JwtPayload = { sub: 'userId', action: 'sign_transaction' };
+		 * const payload: JWTPayload = { sub: 'userId', action: 'sign_transaction' };
 		 * const token = this.jwtAuthService.generateActionToken(payload);
 		 * console.log('Generated Token:', token);
 	*/
-	generateActionToken(payload: JwtPayload): string {
+	generateActionToken(payload: JWTPayload): string {
 	return this.jwtService.sign(payload);
   }
 
@@ -36,7 +36,7 @@ export class JwtAuthService {
 	 * const payload = this.jwtAuthService.validateToken(token);
 	 * console.log('Decoded Payload:', payload);
    */
-  validateToken(token: string): JwtPayload {
+  validateToken(token: string): JWTPayload {
 	return this.jwtService.verify(token);
   }
 }
