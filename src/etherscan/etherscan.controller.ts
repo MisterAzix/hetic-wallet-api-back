@@ -10,7 +10,16 @@ export class EtherscanController {
     if (!address) {
       return { error: 'Address is required' };
     }
-
     return await this.etherscanService.getTransactions(address);
+  }
+
+  @Get('balance')
+  async getBalance(@Query('address') address: string) {
+    if (!address) {
+      return { error: 'Address is required' };
+    }
+    const balanceWei = await this.etherscanService.getBalance(address);
+    const balanceEther = parseFloat(balanceWei) / 1e18; // Convertir wei en ether
+    return { balanceEther, balanceWei };
   }
 }
