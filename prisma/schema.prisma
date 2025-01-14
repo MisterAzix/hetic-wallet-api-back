@@ -7,10 +7,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Symbol {
+  ETH
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  wallets      Wallet[]
+  transactions Transaction[]
+}
+
+model Wallet {
+  id           String        @id @default(uuid())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  symbol       Symbol
+  address      String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+
+  @@unique([symbol, address])
+}
+
+model Transaction {
+  id               String   @id @default(uuid())
+  user             User     @relation(fields: [userId], references: [id])
+  userId           String
+  wallet           Wallet   @relation(fields: [walletId], references: [id])
+  walletId         String
+  blockNumber      Int
+  transactionIndex Int
+  balance          Float
+  date             DateTime @default(now())
 }
