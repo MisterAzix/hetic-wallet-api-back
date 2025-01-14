@@ -11,6 +11,10 @@ enum Symbol {
   ETH
 }
 
+enum Currency {
+  USD
+}
+
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
@@ -32,6 +36,16 @@ model Wallet {
   transactions Transaction[]
 
   @@unique([symbol, address])
+}
+
+model PriceHistory {
+  id       String   @id @default(uuid())
+  symbol   Symbol
+  currency Currency
+  price    Float
+  date     String
+
+  @@unique([symbol, currency, date])
 }
 
 model Transaction {
