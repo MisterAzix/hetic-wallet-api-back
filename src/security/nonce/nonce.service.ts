@@ -10,7 +10,7 @@ export class NonceService {
    * @returns {Promise<string>} Le nonce généré.
    */
   async generateNonce(): Promise<string> {
-    const nonce = Math.random().toString(36).substring(2, 15); 
+    const nonce = Math.random().toString(36).substring(2, 15);
     const timestamp = new Date();
     await prisma.nonce.create({ data: { value: nonce, createdAt: timestamp } });
     return nonce;

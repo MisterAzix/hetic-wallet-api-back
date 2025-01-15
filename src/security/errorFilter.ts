@@ -1,4 +1,9 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
 
 /**
@@ -28,19 +33,18 @@ export class ErrorFilter implements ExceptionFilter {
   }
 }
 
-
 /**
  * Pour utiliser ce filtre d'exception, vous devez l'ajouter à un contrôleur.
  * Exemple d'utilisation dans un contrôleur :
- * 
+ *
  * @UseFilters(new ErrorFilter('auth'))
  * @Controller('auth')
  * export class AuthController {
  *   // Vos méthodes de contrôleur ici
  * }
- * 
+ *
  * Vous pouvez également l'ajouter globalement dans votre application principale :
- * 
+ *
  * async function bootstrap() {
  *   const app = await NestFactory.create(AppModule);
  *   app.useGlobalFilters(new ErrorFilter('auth'));

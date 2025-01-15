@@ -4,6 +4,6 @@ import { EtherscanController } from './etherscan.controller';
 
 @Module({
   providers: [EtherscanService],
-  controllers: [EtherscanController]
+  controllers: [EtherscanController],
 })
 export class EtherscanModule {}

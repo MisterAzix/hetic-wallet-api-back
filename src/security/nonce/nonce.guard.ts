@@ -17,12 +17,16 @@ export class NonceGuard implements CanActivate {
     if (!nonce) return false; // Si aucun nonce n'est fourni, la requête est rejetée
 
     // Vérifie si le nonce existe en base de données
-    const validNonce = await prisma.nonce.findUnique({ where: { value: nonce } });
+    const validNonce = await prisma.nonce.findUnique({
+      where: { value: nonce },
+    });
     if (!validNonce) return false; // Si le nonce n'existe pas, la requête est rejetée
 
     // Vérifie si le nonce est récent (moins de 5 minutes)
-    const nonceAge = new Date().getTime() - new Date(validNonce.createdAt).getTime();
-    if (nonceAge > 5 * 60 * 1000) { // 5 minutes en millisecondes
+    const nonceAge =
+      new Date().getTime() - new Date(validNonce.createdAt).getTime();
+    if (nonceAge > 5 * 60 * 1000) {
+      // 5 minutes en millisecondes
       await prisma.nonce.delete({ where: { value: nonce } });
       return false; // Si le nonce est trop vieux, la requête est rejetée
     }
