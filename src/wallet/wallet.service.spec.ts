@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { EtherscanService } from './etherscan.service';
+import { WalletService } from './wallet.service';
 
-describe('EtherscanService', () => {
-  let service: EtherscanService;
+describe('WalletService', () => {
+  let service: WalletService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule.forRoot()],
-      providers: [EtherscanService],
+      providers: [WalletService],
     }).compile();
 
-    service = module.get<EtherscanService>(EtherscanService);
+    service = module.get<WalletService>(WalletService);
   });
 
   it('should be defined', () => {
@@ -19,9 +19,9 @@ describe('EtherscanService', () => {
   });
 
   it('should fetch transactions', async () => {
-    const result = await service.getTransactions(
+    const result = await service.getWalletByAddress(
       '0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae',
     );
-    expect(result).toHaveProperty('status');
+    expect(result).toHaveProperty('address');
   });
 });

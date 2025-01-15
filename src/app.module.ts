@@ -1,11 +1,11 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { EtherscanModule } from './etherscan/etherscan.module';
+import { WalletModule } from './wallet/wallet.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RateLimitModule } from './security/rate-limit';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
+import { EtherscanModule } from './etherscan/etherscan.module';
 
 @Module({
   imports: [
@@ -15,6 +15,7 @@ import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
     EtherscanModule,
     RateLimitModule,
     CryptocompareModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],
