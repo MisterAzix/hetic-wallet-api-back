@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EtherscanModule } from './etherscan/etherscan.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { AppService } from './app.service';
     EtherscanModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
