@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EtherscanModule } from './etherscan/etherscan.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { AppService } from './app.service';
       isGlobal: true,
     }),
     EtherscanModule,
+    CryptocompareModule,
   ],
   controllers: [AppController],
   providers: [AppService],
