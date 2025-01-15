@@ -15,7 +15,7 @@ import { PriceHistoryModule } from './priceHistory/priceHistory.module';
     WalletModule,
     PriceHistoryModule
   ],
-  controllers: [AppController, PricehistoryController],
-  providers: [AppService, PricehistoryService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
