@@ -1,4 +1,3 @@
-// nonce.guard.ts
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
