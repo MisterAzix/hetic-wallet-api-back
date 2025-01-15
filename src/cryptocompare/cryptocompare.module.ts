@@ -4,6 +4,6 @@ import { CryptocompareController } from './cryptocompare.controller';
 
 @Module({
   providers: [CryptocompareService],
-  controllers: [CryptocompareController]
+  controllers: [CryptocompareController],
 })
 export class CryptocompareModule {}
