@@ -61,9 +61,16 @@ model Transaction {
   date             DateTime @default(now())
 }
 
+
 model RefreshToken {
   user_id    String   @id
   token      String
   expires_at DateTime
   revoked    Boolean  @default(false)
+}
+
+model Nonce {
+  id        String   @id @default(uuid())
+  value     String   @unique
+  createdAt DateTime @default(now())
 }
