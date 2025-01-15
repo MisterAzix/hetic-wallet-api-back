@@ -120,4 +120,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Run Unit Tests
-        run: pnpm run test
+        run: |
+          pnpx prisma generate
+          pnpm run test
