@@ -59,3 +59,10 @@ model Transaction {
   balance          Float
   date             DateTime @default(now())
 }
+
+
+model Nonce {
+  id        String   @id @default(uuid())
+  value     String   @unique
+  createdAt DateTime @default(now())
+}
