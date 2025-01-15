@@ -5,7 +5,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
-    methods: 'GET,POST,PUT,DELETE',
+    methods: process.env.CORS_METHODS,
   });
   app.use((req, res, next) => {
     res.setHeader(
