@@ -44,7 +44,7 @@ model PriceHistory {
   symbol   Symbol
   currency Currency
   price    Float
-  date     String
+  date     DateTime @default(now())
 
   @@unique([symbol, currency, date])
 }
