@@ -1,7 +1,6 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { EtherscanModule } from './etherscan/etherscan.module';
+import { WalletModule } from './wallet/wallet.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
@@ -11,8 +10,8 @@ import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    EtherscanModule,
     CryptocompareModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],
