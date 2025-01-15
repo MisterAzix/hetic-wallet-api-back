@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EtherscanModule } from './etherscan/etherscan.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
 
 @Module({
@@ -15,6 +16,6 @@ import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
     CryptocompareModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
