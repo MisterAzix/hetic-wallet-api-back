@@ -59,3 +59,10 @@ model Transaction {
   balance          Float
   date             DateTime @default(now())
 }
+
+model RefreshToken {
+  user_id    String   @id
+  token      String
+  expires_at DateTime
+  revoked    Boolean  @default(false)
+}
