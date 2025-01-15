@@ -4,6 +4,7 @@ import { WalletModule } from './wallet/wallet.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
+import { PriceHistoryModule } from './priceHistory/priceHistory.module';
 
 @Module({
   imports: [
@@ -12,8 +13,9 @@ import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
     }),
     CryptocompareModule,
     WalletModule,
+    PriceHistoryModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, PricehistoryController],
+  providers: [AppService, PricehistoryService],
 })
 export class AppModule {}
