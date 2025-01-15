@@ -5,6 +5,7 @@ import { EtherscanModule } from './etherscan/etherscan.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from 'prisma/prisma.service';
+import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PrismaService } from 'prisma/prisma.service';
       isGlobal: true,
     }),
     EtherscanModule,
+    CryptocompareModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
