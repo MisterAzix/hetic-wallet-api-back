@@ -8,6 +8,7 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
     methods: process.env.CORS_METHODS,
+    credentials: true,
   });
   app.use((req, res, next) => {
     res.setHeader(
