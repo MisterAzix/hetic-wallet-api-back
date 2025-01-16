@@ -10,7 +10,7 @@ import { EtherscanModule } from './etherscan/etherscan.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './common/PrismaService';
-
+import { NonceModule } from './security/nonce/nonce.module';
 
 @Module({
   imports: [
@@ -23,7 +23,8 @@ import { PrismaService } from './common/PrismaService';
     CryptocompareModule,
     WalletModule,
     PriceHistoryModule,
-    AuthModule
+    AuthModule,
+    NonceModule, 
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
