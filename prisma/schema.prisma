@@ -73,10 +73,3 @@ model Nonce {
   createdAt DateTime @default(now())
 }
 
-enum Symbol {
-  ETH
-}
-
-enum Currency {
-  USD
-}
