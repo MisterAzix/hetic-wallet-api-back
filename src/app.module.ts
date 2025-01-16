@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { RateLimitModule } from './security/rate-limit';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
 import { EtherscanModule } from './etherscan/etherscan.module';
+import { AuthModule } from './auth/auth.module';
+import { PrismaService } from './common/PrismaService';
+
 
 @Module({
   imports: [
@@ -16,8 +19,9 @@ import { EtherscanModule } from './etherscan/etherscan.module';
     RateLimitModule,
     CryptocompareModule,
     WalletModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
