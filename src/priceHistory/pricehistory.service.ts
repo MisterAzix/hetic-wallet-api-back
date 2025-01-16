@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../common/PrismaService';
-import { PriceHistory, Prisma, Symbol } from '@prisma/client';
+import { PriceHistory, Prisma, Symbol, Currency } from '@prisma/client';
 import { CryptocompareService } from '../cryptocompare/cryptocompare.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class PriceHistoryService {
@@ -31,4 +32,19 @@ export class PriceHistoryService {
 
     return priceHistory;
   }
+
+  @Cron('0 50 9 * * * ' )
+  async handleCron() {
+    const symbols: Symbol[] = [Symbol.ETH, Symbol.BTC];
+    const currency: Currency = Currency.USD;
+
+    for (const symbol of symbols) {
+      await this.createFromCryptoCompare(symbol, currency);
+      Logger.log(`Created price history for ${symbol}`, PriceHistoryService.name);
+    }
+  }
+  
 }
+
+
+

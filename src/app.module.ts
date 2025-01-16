@@ -7,9 +7,11 @@ import { RateLimitModule } from './security/rate-limit';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
 import { PriceHistoryModule } from './priceHistory/priceHistory.module';
 import { EtherscanModule } from './etherscan/etherscan.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
