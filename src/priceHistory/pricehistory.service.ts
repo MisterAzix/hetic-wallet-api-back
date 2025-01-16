@@ -10,6 +10,7 @@ export class PriceHistoryService {
     private prisma: PrismaService,
     private cryptoService: CryptocompareService,
   ) {}
+  
   async findByCurrentDate(symbol: Symbol): Promise<PriceHistory | null> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -25,7 +26,7 @@ export class PriceHistoryService {
       orderBy: { date: 'desc' },
     });
   }
-  
+
   async findBySymbol(symbol: Symbol): Promise<PriceHistory[]> {
     return this.prisma.priceHistory.findMany({
       where: { symbol: { equals: symbol } },

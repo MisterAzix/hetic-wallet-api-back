@@ -8,6 +8,9 @@ import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
 import { PriceHistoryModule } from './priceHistory/priceHistory.module';
 import { EtherscanModule } from './etherscan/etherscan.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AuthModule } from './auth/auth.module';
+import { PrismaService } from './common/PrismaService';
+
 
 @Module({
   imports: [
@@ -19,9 +22,10 @@ import { ScheduleModule } from '@nestjs/schedule';
     RateLimitModule,
     CryptocompareModule,
     WalletModule,
-    PriceHistoryModule
+    PriceHistoryModule,
+    AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
