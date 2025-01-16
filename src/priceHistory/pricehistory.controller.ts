@@ -11,12 +11,8 @@ export class PriceHistoryController {
   async findBySymbol(@Param('symbol') symbol: Symbol): Promise<PriceHistory[]> {
     return this.priceHistoryService.findBySymbol(symbol);
   }
-
-  @Post('/create-from-crypto')
-  async createFromCryptoCompare(
-    @Query('symbol') symbol: Symbol,
-    @Query('currency') currency: Currency,
-  ): Promise<PriceHistory> {
-    return this.priceHistoryService.createFromCryptoCompare(symbol, currency);
+  @Get('/current/:symbol')
+  async findByCurrentDate(@Param('symbol') symbol: Symbol): Promise<PriceHistory> {
+    return this.priceHistoryService.findByCurrentDate(symbol);
   }
 }
