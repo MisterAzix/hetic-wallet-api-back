@@ -9,6 +9,7 @@ datasource db {
 
 enum Symbol {
   ETH
+  BTC
 }
 
 enum Currency {
@@ -21,19 +22,19 @@ model User {
   password     String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  wallets      Wallet[]
   transactions Transaction[]
+  wallets      Wallet[]
 }
 
 model Wallet {
   id           String        @id @default(uuid())
-  user         User          @relation(fields: [userId], references: [id])
   userId       String
   symbol       Symbol
   address      String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]
+  user         User          @relation(fields: [userId], references: [id])
 
   @@unique([symbol, address])
 }
@@ -43,27 +44,25 @@ model PriceHistory {
   symbol   Symbol
   currency Currency
   price    Float
-  date     String
+  date     DateTime @default(now())
 
   @@unique([symbol, currency, date])
 }
 
 model Transaction {
   id               String   @id @default(uuid())
-  user             User     @relation(fields: [userId], references: [id])
   userId           String
-  wallet           Wallet   @relation(fields: [walletId], references: [id])
   walletId         String
   blockNumber      Int
   transactionIndex Int
   balance          Float
   date             DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id])
+  wallet           Wallet   @relation(fields: [walletId], references: [id])
 }
 
-
 model RefreshToken {
-  user_id    String   @id
-  token      String
+  token      String   @unique(map: "unique_token_index")
   expires_at DateTime
   revoked    Boolean  @default(false)
 }
@@ -72,4 +71,12 @@ model Nonce {
   id        String   @id @default(uuid())
   value     String   @unique
   createdAt DateTime @default(now())
+}
+
+enum Symbol {
+  ETH
+}
+
+enum Currency {
+  USD
 }
