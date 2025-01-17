@@ -7,8 +7,8 @@ export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 
   @Post('/')
-  async createWallet(@Body() body: { address: string }): Promise<void> {
-    await this.walletService.createWallet(body.address);
+  async createWallet(@Body() body: { address: string, userId: string }): Promise<void> {
+    await this.walletService.createWallet(body.address, body.userId);
   }
 
   @Get('/:address')
