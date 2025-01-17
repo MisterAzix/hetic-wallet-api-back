@@ -50,7 +50,7 @@ export class PriceHistoryService {
     return priceHistory;
   }
 
-  @Cron('0 00 6 * * * ' )
+  @Cron('0 07 16 * * * ' ) // SS:MM:HH 
   async handleCron() {
     const symbols: Symbol[] = [Symbol.ETH];
     const currency: Currency = Currency.USD;
