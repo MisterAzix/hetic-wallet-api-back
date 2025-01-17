@@ -1,36 +1,61 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WalletController } from './wallet.controller';
-import { WalletService } from './wallet.service';
+import { PriceHistoryController } from './pricehistory.controller';
+import { PriceHistoryService } from './pricehistory.service';
 import { NonceGuard } from '../security/nonce/nonce.guard';
 import { ExecutionContext } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PrismaService } from '../common/PrismaService';
+import { CryptocompareService } from '../cryptocompare/cryptocompare.service';
 
-describe('WalletController', () => {
-  let controller: WalletController;
+describe('PriceHistoryController', () => {
+  let controller: PriceHistoryController;
   let guard: NonceGuard;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [ConfigModule.forRoot()],
-      controllers: [WalletController],
+      controllers: [PriceHistoryController],
       providers: [
-        WalletService,
+        PriceHistoryService,
         PrismaService,
         ConfigService,
+        CryptocompareService,
         {
           provide: NonceGuard,
           useValue: {
             canActivate: jest.fn(async (context: ExecutionContext) => {
-              const request = {
-                headers: {
-                  'x-nonce': 'test-nonce',
-                },
-              };
-              context.switchToHttp = jest.fn().mockReturnValue({
-                getRequest: jest.fn().mockReturnValue(request),
+              const request = context.switchToHttp().getRequest();
+              const nonce = request.headers['x-nonce'];
+              console.log('Nonce:', nonce);
+
+              if (!nonce) {
+                console.log('No nonce provided');
+                return false;
+              }
+
+              const validNonce = await prisma.nonce.findUnique({
+                where: { value: nonce },
               });
+              console.log('Valid nonce:', validNonce);
+
+              if (!validNonce) {
+                console.log('Nonce not found in database');
+                return false;
+              }
+
+              const nonceAge =
+                new Date().getTime() - new Date(validNonce.createdAt).getTime();
+              console.log('Nonce age (ms):', nonceAge);
+
+              if (nonceAge > 5 * 60 * 1000) {
+                await prisma.nonce.delete({ where: { value: nonce } });
+                console.log('Nonce too old, deleted from database');
+                return false;
+              }
+
+              await prisma.nonce.delete({ where: { value: nonce } });
+              console.log('Nonce valid, deleted from database');
               return true;
             }),
           },
@@ -38,7 +63,7 @@ describe('WalletController', () => {
       ],
     }).compile();
 
-    controller = module.get<WalletController>(WalletController);
+    controller = module.get<PriceHistoryController>(PriceHistoryController);
     guard = module.get<NonceGuard>(NonceGuard);
     prisma = module.get<PrismaService>(PrismaService);
 
@@ -60,7 +85,7 @@ describe('WalletController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should apply NonceGuard to POST /wallet/', async () => {
+  it('should apply NonceGuard to GET /pricehistory/:symbol', async () => {
     const context: ExecutionContext = {
       switchToHttp: jest.fn().mockReturnValue({
         getRequest: jest.fn().mockReturnValue({

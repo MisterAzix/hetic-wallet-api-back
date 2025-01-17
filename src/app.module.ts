@@ -5,10 +5,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RateLimitModule } from './security/rate-limit';
 import { CryptocompareModule } from './cryptocompare/cryptocompare.module';
+import { PriceHistoryModule } from './priceHistory/priceHistory.module';
 import { EtherscanModule } from './etherscan/etherscan.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AuthModule } from './auth/auth.module';
+import { PrismaService } from './common/PrismaService';
+
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -16,8 +22,10 @@ import { EtherscanModule } from './etherscan/etherscan.module';
     RateLimitModule,
     CryptocompareModule,
     WalletModule,
+    PriceHistoryModule,
+    AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
