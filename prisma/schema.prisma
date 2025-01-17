@@ -17,13 +17,15 @@ enum Currency {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  transactions Transaction[]
-  wallets      Wallet[]
+  id                String        @id @default(uuid())
+  email             String        @unique
+  password          String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  isVerified        Boolean       @default(false)
+  verificationToken String?        @unique
+  transactions      Transaction[]
+  wallets           Wallet[]
 }
 
 model Wallet {
@@ -63,7 +65,7 @@ model Transaction {
 
 model RefreshToken {
   token      String   @unique(map: "unique_token_index")
-  expires_at DateTime
+  expiresAt DateTime
   revoked    Boolean  @default(false)
 }
 
@@ -73,3 +75,19 @@ model Nonce {
   createdAt DateTime @default(now())
 }
 
+model PasswordResets {
+  id        Int       @id(map: "password_resets_pkey") @default(autoincrement())
+  email     String    @db.VarChar(255)
+  token     String    @db.VarChar(255)
+  expiresAt DateTime  @db.Timestamp(6)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  used      Boolean?  @default(false)
+}
+
+enum Symbol {
+  ETH
+}
+
+enum Currency {
+  USD
+}
