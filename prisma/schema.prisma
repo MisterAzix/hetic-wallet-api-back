@@ -24,7 +24,6 @@ model User {
   updatedAt         DateTime      @updatedAt
   isVerified        Boolean       @default(false)
   verificationToken String?        @unique
-  transactions      Transaction[]
   wallets           Wallet[]
 }
 
@@ -59,7 +58,6 @@ model Transaction {
   transactionIndex Int
   balance          Float
   date             DateTime @default(now())
-  user             User     @relation(fields: [userId], references: [id])
   wallet           Wallet   @relation(fields: [walletId], references: [id])
 }
 
@@ -82,12 +80,4 @@ model PasswordResets {
   expiresAt DateTime  @db.Timestamp(6)
   createdAt DateTime? @default(now()) @db.Timestamp(6)
   used      Boolean?  @default(false)
-}
-
-enum Symbol {
-  ETH
-}
-
-enum Currency {
-  USD
 }
