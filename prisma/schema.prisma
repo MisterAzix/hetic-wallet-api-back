@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Symbol {
+  ETH
+  BTC
+}
+
+enum Currency {
+  USD
+}
+
 model User {
   id           String        @id @default(uuid())
   email        String        @unique
@@ -35,7 +44,7 @@ model PriceHistory {
   symbol   Symbol
   currency Currency
   price    Float
-  date     String
+  date     DateTime @default(now())
 
   @@unique([symbol, currency, date])
 }
@@ -64,10 +73,3 @@ model Nonce {
   createdAt DateTime @default(now())
 }
 
-enum Symbol {
-  ETH
-}
-
-enum Currency {
-  USD
-}

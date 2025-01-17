@@ -5,7 +5,7 @@ import { EtherscanService } from './etherscan.service';
 @Controller('etherscan')
 export class EtherscanController {
   constructor(private readonly etherscanService: EtherscanService) {}
-
+  
   @Get('transactions')
   async getTransactions(@Query('address') address: string) {
     if (!address) {
