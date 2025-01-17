@@ -42,7 +42,6 @@ export class AuthService {
         revoked: false,
       },
     });
-
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
