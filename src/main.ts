@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ErrorFilter } from './security/errorFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,7 @@ async function bootstrap() {
     methods: process.env.CORS_METHODS,
     credentials: true,
   });
+  app.useGlobalFilters(new ErrorFilter())
   app.use((req, res, next) => {
     res.setHeader(
       'Content-Security-Policy',
