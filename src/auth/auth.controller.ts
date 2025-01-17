@@ -17,7 +17,8 @@ export class AuthController {
 
     return res.json({ message: 'Login successful', accessToken, user });
   }
-  
+
+
 
   @Post('/register')
   async register(@Body() registerDto: RegisterDto): Promise<boolean> {
