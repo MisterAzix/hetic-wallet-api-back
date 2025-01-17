@@ -8,6 +8,7 @@ import { ResetPasswordDto } from './dto/reset.password.dto';
 import { Response } from 'express';
 import * as crypto from 'crypto';
 
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,9 +18,10 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async login(email: string, password: string, res: Response): Promise<boolean> {
+  async login(email: string, password: string, res: Response): Promise<{ accessToken: string, user: any }> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: { wallets: { include: { transactions: true } } },
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -30,9 +32,18 @@ export class AuthService {
       expiresIn: '30m',
     });
 
-    const refreshToken = this.jwtService.sign({ email: user.email, id: user.id }, {
-      expiresIn: '7d',
-    });
+    let refreshToken: string;
+    let tokenExists: boolean;
+
+    do {
+      refreshToken = this.jwtService.sign({ email: user.email, id: user.id }, {
+        expiresIn: '7d',
+      });
+
+      tokenExists = await this.prisma.refreshToken.findUnique({
+        where: { token: refreshToken },
+      }) !== null;
+    } while (tokenExists);
 
     await this.prisma.refreshToken.create({
       data: {
@@ -49,8 +60,7 @@ export class AuthService {
       sameSite: 'strict',
     });
 
-    res.json({ accessToken });
-    return true;
+    return { accessToken, user };
   }
 
   async register(email: string, password: string, confirmPassword: string): Promise<boolean> {
