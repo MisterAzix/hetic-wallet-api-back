@@ -13,12 +13,14 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const { email, password } = loginDto;
-    const { accessToken, user } = await this.authService.login(email, password, res);
+    const isValid = await this.authService.login(email, password, res);
 
-    return res.json({ message: 'Login successful', accessToken, user });
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return res.json({ message: 'Login successful' });
   }
-
-
 
   @Post('/register')
   async register(@Body() registerDto: RegisterDto): Promise<boolean> {
