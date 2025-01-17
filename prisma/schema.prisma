@@ -63,7 +63,7 @@ model Transaction {
 
 model RefreshToken {
   token      String   @unique(map: "unique_token_index")
-  expiresAt DateTime
+  expiresAt  DateTime
   revoked    Boolean  @default(false)
 }
 
