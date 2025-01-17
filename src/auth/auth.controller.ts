@@ -13,13 +13,9 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const { email, password } = loginDto;
-    const isValid = await this.authService.login(email, password, res);
+    const { accessToken, user } = await this.authService.login(email, password, res);
 
-    if (!isValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    return res.json({ message: 'Login successful' });
+    return res.json({ message: 'Login successful', accessToken, user });
   }
 
   @Post('/register')
@@ -56,8 +52,12 @@ export class AuthController {
   }
 
   @Post('/refresh-token')
-  async refreshToken(@Body() body: { refreshToken: string }, @Res() res: Response) {
-    return this.authService.refreshTokens(body.refreshToken, res);
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies['refreshToken'];
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token found');
+    }
+    return this.authService.refreshTokens(refreshToken, res);
   }
 
   @Post('/logout')
