@@ -17,10 +17,9 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async login(email: string, password: string, res: Response): Promise<{ accessToken: string, user: any }> {
+  async login(email: string, password: string, res: Response): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
       where: { email },
-      include: { wallets: true }, // Inclure les portefeuilles associés
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -42,6 +41,7 @@ export class AuthService {
         revoked: false,
       },
     });
+
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -49,7 +49,8 @@ export class AuthService {
       sameSite: 'strict',
     });
 
-    return { accessToken, user };
+    res.json({ accessToken });
+    return true;
   }
 
   async register(email: string, password: string, confirmPassword: string): Promise<boolean> {
