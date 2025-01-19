@@ -57,18 +57,18 @@ model Transaction {
   walletId         String
   blockNumber      Int
   transactionIndex Int
-  balance          Float
+  balance          String
   date             DateTime @default(now())
   wallet           Wallet   @relation(fields: [walletId], references: [id])
 }
 
 model RefreshToken {
-  id         String   @id @default(uuid())
-  token      String   @unique(map: "unique_token_index")
-  expiresAt  DateTime
-  revoked    Boolean  @default(false)
-  userId     String
-  user       User     @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade) // Relation avec User
+  id        String   @id @default(uuid())
+  token     String   @unique(map: "unique_token_index")
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  userId    String
+  user      User     @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade) // Relation avec User
 }
 
 model Nonce {
