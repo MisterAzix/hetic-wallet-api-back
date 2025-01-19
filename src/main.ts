@@ -26,7 +26,7 @@ async function bootstrap() {
     );
     next();
   });
-  const apiPrefix = process.env.API_VERSION || 'api/v1';
+  const apiPrefix = `api/${process.env.API_VERSION || 'v1'}`;
   app.setGlobalPrefix(apiPrefix);
 
   await app.listen(3000);
