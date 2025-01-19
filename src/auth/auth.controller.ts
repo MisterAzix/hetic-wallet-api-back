@@ -1,4 +1,14 @@
-import { Controller, Post, Get, Param, Body, Req, Res, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Req,
+  Res,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -13,7 +23,11 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginDto: LoginDto, @Res() res: Response) {
     const { email, password } = loginDto;
-    const { accessToken, user } = await this.authService.login(email, password, res);
+    const { accessToken, user } = await this.authService.login(
+      email,
+      password,
+      res,
+    );
 
     return res.json({ message: 'Login successful', accessToken, user });
   }
@@ -38,16 +52,24 @@ export class AuthController {
   async resetPassword(
     @Param('token') token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
-      const message = await this.authService.resetPassword(token, resetPasswordDto);
+      const message = await this.authService.resetPassword(
+        token,
+        resetPasswordDto,
+      );
       return res.json({ message });
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         return res.status(400).json({ message: error.message });
       }
-      return res.status(500).json({ message: 'Error resetting password', error: error.message });
+      return res
+        .status(500)
+        .json({ message: 'Error resetting password', error: error.message });
     }
   }
 
@@ -72,7 +94,9 @@ export class AuthController {
 
       return res.json({ message: 'Logout successful' });
     } catch (error) {
-      return res.status(500).json({ message: 'Logout failed', error: error.message });
+      return res
+        .status(500)
+        .json({ message: 'Logout failed', error: error.message });
     }
   }
 }

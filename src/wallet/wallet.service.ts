@@ -23,8 +23,7 @@ export class WalletService {
     );
   }
 
-  async createWallet(address: string,  userId: string): Promise<void> {
-
+  async createWallet(address: string, userId: string): Promise<void> {
     await this.prisma.wallet.create({
       data: {
         userId: userId,

@@ -5,7 +5,7 @@ import { PrismaService } from '../common/PrismaService';
 import { CryptocompareModule } from '../cryptocompare/cryptocompare.module';
 
 @Module({
-  imports: [CryptocompareModule], 
+  imports: [CryptocompareModule],
   controllers: [PriceHistoryController],
   providers: [PriceHistoryService, PrismaService],
 })
