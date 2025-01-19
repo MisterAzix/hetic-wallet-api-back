@@ -55,7 +55,7 @@ export class AuthController {
   async refreshToken(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) {
-      throw new UnauthorizedException('No refresh token found');
+      return res.status(401).json({ message: 'No refresh token found' });
     }
     return this.authService.refreshTokens(refreshToken, res);
   }
@@ -67,15 +67,8 @@ export class AuthController {
     if (!refreshToken) {
       return res.status(401).json({ message: 'No refresh token found' });
     }
-
     try {
-      await this.authService.logout(refreshToken);
-
-      res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-      });
+      await this.authService.logout(refreshToken, res);
 
       return res.json({ message: 'Logout successful' });
     } catch (error) {
