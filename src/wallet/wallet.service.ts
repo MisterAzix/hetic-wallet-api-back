@@ -66,7 +66,7 @@ export class WalletService {
     let startBlock = 0;
     let lastTransactionIndex = -1;
     let hasMoreTransactions = true;
-    let balance = 0;
+    let balance = 0n;
 
     const lastTransaction = await this.prisma.transaction.findFirst({
       where: {
@@ -85,7 +85,7 @@ export class WalletService {
     if (lastTransaction) {
       startBlock = lastTransaction.blockNumber;
       lastTransactionIndex = lastTransaction.transactionIndex;
-      balance = lastTransaction.balance;
+      balance = BigInt(lastTransaction.balance);
     }
 
     console.log(`Starting updateTransactions for address: ${address}`);
@@ -144,9 +144,9 @@ export class WalletService {
             continue;
           }
 
-          const value = parseFloat(tx.value);
-          const gasUsed = parseFloat(tx.gasUsed);
-          const gasPrice = parseFloat(tx.gasPrice);
+          const value = BigInt(tx.value);
+          const gasUsed = BigInt(tx.gasUsed);
+          const gasPrice = BigInt(tx.gasPrice);
           const transactionCost = gasUsed * gasPrice;
 
           if (tx.from.toLowerCase() === address.toLowerCase()) {
@@ -154,7 +154,7 @@ export class WalletService {
             console.log(`[INFO] Sent ${value} ETH`);
           } else if (tx.to.toLowerCase() === address.toLowerCase()) {
             balance += value;
-            //console.log(`[INFO] Received ${value} ETH`);
+            console.log(`[INFO] Received ${value} ETH`);
           }
 
           const transaction: Transaction = {
@@ -163,7 +163,7 @@ export class WalletService {
             walletId: wallet.id,
             blockNumber: blockNumber,
             transactionIndex: transactionIndex,
-            balance: balance,
+            balance: balance.toString(),
             date: new Date(parseInt(tx.timeStamp) * 1000),
           };
 
