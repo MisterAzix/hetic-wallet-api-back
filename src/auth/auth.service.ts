@@ -1,13 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../common/PrismaService';
 import { ResetPasswordDto } from './dto/reset.password.dto';
 import { Response } from 'express';
 import * as crypto from 'crypto';
-
 
 @Injectable()
 export class AuthService {
@@ -15,7 +13,6 @@ export class AuthService {
     private prisma: PrismaService,
     private mailerService: MailerService,
     private jwtService: JwtService,
-    private configService: ConfigService,
   ) {}
 
   async login(email: string, password: string, res: Response): Promise<{ accessToken: string, user: any }> {
@@ -28,26 +25,33 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.isVerified) {
+      throw new UnauthorizedException('Please verify your email before logging in.');
+    }
+
     const accessToken = this.jwtService.sign({ email: user.email, id: user.id }, {
       expiresIn: '30m',
     });
 
-    let refreshToken: string;
-    let tokenExists: boolean;
+    const refreshToken = crypto.randomBytes(32).toString('hex');
 
-    do {
-      refreshToken = this.jwtService.sign({ email: user.email, id: user.id }, {
-        expiresIn: '7d',
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+
+    const existingToken = await this.prisma.refreshToken.findFirst({
+      where: { userId: user.id, revoked: false },
+    });
+
+    if (existingToken) {
+      await this.prisma.refreshToken.update({
+        where: { id: existingToken.id },
+        data: { revoked: true },
       });
-
-      tokenExists = await this.prisma.refreshToken.findUnique({
-        where: { token: refreshToken },
-      }) !== null;
-    } while (tokenExists);
+    }
 
     await this.prisma.refreshToken.create({
       data: {
-        token: refreshToken,
+        userId: user.id,
+        token: hashedRefreshToken,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         revoked: false,
       },
@@ -141,7 +145,7 @@ export class AuthService {
       text: `Cliquez sur ce lien pour réinitialiser votre mot de passe : ${resetPasswordLink}`,
     });
 
-    return 'Un lien de réinitialisation a été envoyé à votre email';
+    return 'A reset link has been sent to your email.';
   }
 
   async resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<string> {
@@ -152,12 +156,12 @@ export class AuthService {
     });
 
     if (!resetRecord) {
-      throw new NotFoundException('Token invalide ou expiré');
+      throw new NotFoundException('Invalid or expired token');
     }
 
     const currentTime = new Date();
     if (resetRecord.expiresAt < currentTime) {
-      throw new BadRequestException('Le token a expiré');
+      throw new BadRequestException('The token has expired');
     }
 
     const user = await this.prisma.user.findUnique({
@@ -165,7 +169,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('Utilisateur non trouvé');
+      throw new NotFoundException('User not found');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -180,52 +184,68 @@ export class AuthService {
       data: { used: true },
     });
 
-    return 'Mot de passe réinitialisé avec succès';
+    return 'Password successfully reset';
   }
 
   async refreshTokens(refreshToken: string, res: Response): Promise<any> {
     try {
       const payload = this.jwtService.verify(refreshToken);
 
-      const storedToken = await this.prisma.refreshToken.findUnique({
-        where: { token: refreshToken },
+      const storedToken = await this.prisma.refreshToken.findFirst({
+        where: { userId: payload.id, revoked: false },
       });
 
-      if (!storedToken || storedToken.revoked || new Date(storedToken.expiresAt) < new Date()) {
-        throw new UnauthorizedException('Refresh token invalid or expired');
+      if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.token)) || new Date(storedToken.expiresAt) < new Date() || storedToken.revoked) {
+        throw new UnauthorizedException('Refresh token invalid, expired, or revoked');
       }
 
       const newAccessToken = this.jwtService.sign({ email: payload.email, id: payload.id });
 
-      return res.json({ accessToken: newAccessToken });
+      return res.json({ accessToken: newAccessToken, user: payload });
     } catch (err) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
-  async revokeRefreshToken(refreshToken: string): Promise<void> {
-    await this.prisma.refreshToken.update({
-      where: { token: refreshToken },
-      data: { revoked: true },
-    });
+  async logout(refreshToken: string, res: Response): Promise<void> {
+    try {
+      const storedToken = await this.prisma.refreshToken.findFirst({
+        where: { revoked: false },
+      });
+
+      if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.token))) {
+        throw new UnauthorizedException('Token invalide ou déjà révoqué');
+      }
+
+      await this.prisma.refreshToken.update({
+        where: { id: storedToken.id },
+        data: { revoked: true },
+      });
+
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
+
+      res.status(200).send('Logout successful');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      throw new InternalServerErrorException('Internal error during logout');
+    }
   }
 
-  async logout(refreshToken: string): Promise<void> {
-
+  async revokeRefreshToken(refreshToken: string): Promise<void> {
     const storedToken = await this.prisma.refreshToken.findUnique({
-      where: { token: refreshToken },
+      where: { token: refreshToken, revoked: false },
     });
 
-    if (!storedToken) {
-      throw new UnauthorizedException('Refresh token not found');
-    }
-
-    if (storedToken.revoked) {
-      throw new UnauthorizedException('Token already revoked');
+    if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.token))) {
+      throw new UnauthorizedException('Invalid or already revoked token');
     }
 
     await this.prisma.refreshToken.update({
-      where: { token: refreshToken },
+      where: { id: storedToken.id },
       data: { revoked: true },
     });
   }

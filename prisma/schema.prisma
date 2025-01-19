@@ -17,14 +17,15 @@ enum Currency {
 }
 
 model User {
-  id                String        @id @default(uuid())
-  email             String        @unique
+  id                String         @id @default(uuid())
+  email             String         @unique
   password          String
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  isVerified        Boolean       @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  isVerified        Boolean        @default(false)
   verificationToken String?        @unique
   wallets           Wallet[]
+  refreshTokens     RefreshToken[] @relation("UserRefreshTokens")
 }
 
 model Wallet {
@@ -62,9 +63,12 @@ model Transaction {
 }
 
 model RefreshToken {
+  id         String   @id @default(uuid())
   token      String   @unique(map: "unique_token_index")
   expiresAt  DateTime
   revoked    Boolean  @default(false)
+  userId     String
+  user       User     @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade) // Relation avec User
 }
 
 model Nonce {
