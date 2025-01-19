@@ -11,7 +11,10 @@ export class PriceHistoryService {
     private cryptoService: CryptocompareService,
   ) {}
 
-  async createFromCryptoCompare(symbol: Symbol, currency: 'USD'): Promise<PriceHistory> {
+  async createFromCryptoCompare(
+    symbol: Symbol,
+    currency: 'USD',
+  ): Promise<PriceHistory> {
     const priceData = await this.cryptoService.getCryptoPrice(symbol, currency);
     const price = priceData[currency];
 
@@ -27,14 +30,17 @@ export class PriceHistoryService {
     return priceHistory;
   }
 
-  @Cron('50 40 16 * * * ' ) // SS:MM:HH 
+  @Cron('50 40 16 * * * ') // SS:MM:HH
   async handleCron() {
     const symbols: Symbol[] = [Symbol.ETH];
     const currency: Currency = Currency.USD;
 
     for (const symbol of symbols) {
       await this.createFromCryptoCompare(symbol, currency);
-      Logger.log(`Created price history for ${symbol}`, PriceHistoryService.name);
+      Logger.log(
+        `Created price history for ${symbol}`,
+        PriceHistoryService.name,
+      );
     }
   }
 

@@ -1,7 +1,14 @@
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/PrismaService';
 import { ResetPasswordDto } from './dto/reset.password.dto';
 import { Response } from 'express';
@@ -15,7 +22,11 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(email: string, password: string, res: Response): Promise<{ accessToken: string, user: any }> {
+  async login(
+    email: string,
+    password: string,
+    res: Response,
+  ): Promise<{ accessToken: string; user: any }> {
     const user = await this.prisma.user.findUnique({
       where: { email },
       include: { wallets: { include: { transactions: true } } },
@@ -26,12 +37,17 @@ export class AuthService {
     }
 
     if (!user.isVerified) {
-      throw new UnauthorizedException('Please verify your email before logging in.');
+      throw new UnauthorizedException(
+        'Please verify your email before logging in.',
+      );
     }
 
-    const accessToken = this.jwtService.sign({ email: user.email, id: user.id }, {
-      expiresIn: '30m',
-    });
+    const accessToken = this.jwtService.sign(
+      { email: user.email, id: user.id },
+      {
+        expiresIn: '30m',
+      },
+    );
 
     const refreshToken = crypto.randomBytes(32).toString('hex');
 
@@ -67,7 +83,11 @@ export class AuthService {
     return { accessToken, user };
   }
 
-  async register(email: string, password: string, confirmPassword: string): Promise<boolean> {
+  async register(
+    email: string,
+    password: string,
+    confirmPassword: string,
+  ): Promise<boolean> {
     if (password !== confirmPassword) {
       throw new UnauthorizedException('Passwords do not match');
     }
@@ -148,7 +168,10 @@ export class AuthService {
     return 'A reset link has been sent to your email.';
   }
 
-  async resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<string> {
+  async resetPassword(
+    token: string,
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<string> {
     const { password } = resetPasswordDto;
 
     const resetRecord = await this.prisma.passwordResets.findFirst({
@@ -195,14 +218,24 @@ export class AuthService {
         where: { userId: payload.id, revoked: false },
       });
 
-      if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.token)) || new Date(storedToken.expiresAt) < new Date() || storedToken.revoked) {
-        throw new UnauthorizedException('Refresh token invalid, expired, or revoked');
+      if (
+        !storedToken ||
+        !(await bcrypt.compare(refreshToken, storedToken.token)) ||
+        new Date(storedToken.expiresAt) < new Date() ||
+        storedToken.revoked
+      ) {
+        throw new UnauthorizedException(
+          'Refresh token invalid, expired, or revoked',
+        );
       }
 
-      const newAccessToken = this.jwtService.sign({ email: payload.email, id: payload.id });
+      const newAccessToken = this.jwtService.sign({
+        email: payload.email,
+        id: payload.id,
+      });
 
       return res.json({ accessToken: newAccessToken, user: payload });
-    } catch (err) {
+    } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
@@ -213,7 +246,10 @@ export class AuthService {
         where: { revoked: false },
       });
 
-      if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.token))) {
+      if (
+        !storedToken ||
+        !(await bcrypt.compare(refreshToken, storedToken.token))
+      ) {
         throw new UnauthorizedException('Token invalide ou déjà révoqué');
       }
 
@@ -240,7 +276,10 @@ export class AuthService {
       where: { token: refreshToken, revoked: false },
     });
 
-    if (!storedToken || !(await bcrypt.compare(refreshToken, storedToken.token))) {
+    if (
+      !storedToken ||
+      !(await bcrypt.compare(refreshToken, storedToken.token))
+    ) {
       throw new UnauthorizedException('Invalid or already revoked token');
     }
 

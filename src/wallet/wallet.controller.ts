@@ -9,7 +9,9 @@ export class WalletController {
 
   @Post('/')
   @UseGuards(NonceGuard)
-  async createWallet(@Body() body: { address: string; userId: string }): Promise<void> {
+  async createWallet(
+    @Body() body: { address: string; userId: string },
+  ): Promise<void> {
     await this.walletService.createWallet(body.address, body.userId);
   }
 
